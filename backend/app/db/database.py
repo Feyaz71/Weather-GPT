@@ -1,8 +1,12 @@
 import os
-import aiosqlite
 from app.core.config import settings
 from app.core.logging import logger
 
+try:
+    import aiosqlite
+    HAS_AIOSQLITE = True
+except ImportError:
+    HAS_AIOSQLITE = False
 
 DB_FILE = "weathergpt.db"
 
@@ -35,8 +39,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 );
 """
 
-
 async def init_db():
+    if not HAS_AIOSQLITE:
+        logger.info("aiosqlite driver not installed, running in in-memory state mode.")
+        return
+
     try:
         async with aiosqlite.connect(DB_FILE) as db:
             await db.executescript(CREATE_TABLES_SQL)
