@@ -22,10 +22,52 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { weatherService } from '../../services/api';
 import { ModelComparisonResponse } from '../../types/weather';
 
+const HINDI_CONDITIONS: Record<string, string> = {
+  'Thunderstorm with Moderate Rain': 'मध्यम वर्षा के साथ आंधी और गरज-चमक',
+  'Thunderstorm with Heavy Rain': 'भारी वर्षा के साथ भीषण आंधी-तूफान',
+  'Partly Cloudy': 'आंशिक रूप से बादल',
+  'Mostly Cloudy': 'अधिकांशतः बादल छाए रहेंगे',
+  'Overcast': 'घने बादल',
+  'Clear Sky': 'साफ मौसम / धूप',
+  'Sunny': 'चमकदार धूप',
+  'Moderate Rain': 'मध्यम बारिश',
+  'Heavy Rain': 'भारी बारिश',
+  'Light Rain': 'हल्की फुहारें / बूंदाबांदी',
+  'Drizzle': 'हल्की बूंदाबांदी',
+  'Fog': 'घना कोहरा',
+  'Mist': 'हल्का कोहरा / धुंध',
+  'Haze': 'धुंध'
+};
+
+const HINDI_DAYS: Record<string, string> = {
+  'Today': 'आज',
+  'Tomorrow': 'कल',
+  'Monday': 'सोमवार',
+  'Tuesday': 'मंगलवार',
+  'Wednesday': 'बुधवार',
+  'Thursday': 'गुरुवार',
+  'Friday': 'शुक्रवार',
+  'Saturday': 'शनिवार',
+  'Sunday': 'रविवार'
+};
+
 export const WeatherDashboard: React.FC = () => {
-  const { location, unit, currentWeather, forecast, warnings, loading } = useWeather();
+  const { location, unit, currentWeather, forecast, warnings, loading, language } = useWeather();
   const { t } = useTranslation();
   const [modelComparison, setModelComparison] = useState<ModelComparisonResponse | null>(null);
+
+  const isHi = language === 'hi';
+
+  const translateCondition = (cond?: string) => {
+    if (!cond) return isHi ? 'आंशिक रूप से बादल' : 'Partly Cloudy';
+    if (isHi && HINDI_CONDITIONS[cond]) return HINDI_CONDITIONS[cond];
+    return cond;
+  };
+
+  const translateDay = (day: string) => {
+    if (isHi && HINDI_DAYS[day]) return HINDI_DAYS[day];
+    return day;
+  };
 
   useEffect(() => {
     const fetchComparison = async () => {
@@ -44,7 +86,9 @@ export const WeatherDashboard: React.FC = () => {
       <div className="flex items-center justify-center h-96">
         <div className="text-center space-y-3">
           <div className="w-8 h-8 rounded-full border-3 border-blue-600 border-t-transparent animate-spin mx-auto"></div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Loading authoritative IMD meteorological telemetry...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {isHi ? 'आईएमडी के आधिकारिक मौसम विज्ञान डेटा को लोड किया जा रहा है...' : 'Loading authoritative IMD meteorological telemetry...'}
+          </p>
         </div>
       </div>
     );
@@ -73,15 +117,23 @@ export const WeatherDashboard: React.FC = () => {
           <div className="flex-1">
             <div className="flex items-center space-x-2">
               <span className="font-black text-xs uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-800 dark:text-amber-300">
-                {primaryWarning.severity} Warning
+                {isHi ? (primaryWarning.severity === 'ORANGE' ? 'नारंगी चेतावनी (ORANGE ALERT)' : primaryWarning.severity === 'RED' ? 'लाल चेतावनी (RED ALERT)' : 'पीली चेतावनी (YELLOW ALERT)') : `${primaryWarning.severity} Warning`}
               </span>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">({primaryWarning.source})</span>
             </div>
-            <p className="text-sm sm:text-base font-bold mt-1 text-slate-900 dark:text-white">{primaryWarning.title}</p>
-            <p className="text-xs opacity-90 mt-1 leading-relaxed">{primaryWarning.description}</p>
+            <p className="text-sm sm:text-base font-bold mt-1 text-slate-900 dark:text-white">
+              {isHi && primaryWarning.severity === 'ORANGE'
+                ? 'नारंगी चेतावनी: गरज-चमक के साथ तेज हवाएं (30-40 किमी/घंटा) और मध्यम वर्षा'
+                : primaryWarning.title}
+            </p>
+            <p className="text-xs opacity-90 mt-1 leading-relaxed">
+              {isHi && primaryWarning.severity === 'ORANGE'
+                ? `अगले 24-48 घंटों के दौरान ${location} और आसपास के क्षेत्रों में बिजली चमकने व आंधी के साथ मध्यम वर्षा की संभावना है।`
+                : primaryWarning.description}
+            </p>
             {primaryWarning.action_suggested && (
               <p className="text-xs font-bold mt-2 text-blue-700 dark:text-amber-300 underline underline-offset-2">
-                Public Safety Advisory: {primaryWarning.action_suggested}
+                {isHi ? 'सार्वजनिक सुरक्षा सलाह: पेड़ों के नीचे शरण न लें। संवेदनशील विद्युत उपकरणों को अनप्लग करें।' : `Public Safety Advisory: ${primaryWarning.action_suggested}`}
               </p>
             )}
           </div>
@@ -113,7 +165,7 @@ export const WeatherDashboard: React.FC = () => {
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                  {currentWeather?.weather_condition || 'Partly Cloudy'}
+                  {translateCondition(currentWeather?.weather_condition)}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
                   {t.feels_like} {tempDisplay(currentWeather?.feels_like_c)}
@@ -141,7 +193,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.humidity_pct || 70}%</span>
-              <p className="text-[11px] text-slate-400 mt-0.5">Dew Point ~23°C</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{isHi ? 'ओस बिंदु ~23°C' : 'Dew Point ~23°C'}</p>
             </div>
           </div>
 
@@ -153,7 +205,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.wind_speed_kmh || 15} km/h</span>
-              <p className="text-[11px] text-slate-400 mt-0.5">Gusts: {currentWeather?.wind_gust_kmh || 25} km/h</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{isHi ? `झोंके: ${currentWeather?.wind_gust_kmh || 25} km/h` : `Gusts: ${currentWeather?.wind_gust_kmh || 25} km/h`}</p>
             </div>
           </div>
 
@@ -165,7 +217,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-blue-600 dark:text-cyan-400">{currentWeather?.rainfall_24h_mm || 0} mm</span>
-              <p className="text-[11px] text-slate-400 mt-0.5">1h Rate: {currentWeather?.rainfall_1h_mm || 0} mm/h</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{isHi ? `1h दर: ${currentWeather?.rainfall_1h_mm || 0} mm/h` : `1h Rate: ${currentWeather?.rainfall_1h_mm || 0} mm/h`}</p>
             </div>
           </div>
 
@@ -177,7 +229,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.pressure_hpa || 1008} hPa</span>
-              <p className="text-[11px] text-slate-400 mt-0.5">MSL Normalized</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{isHi ? 'समुद्र तल मानक' : 'MSL Normalized'}</p>
             </div>
           </div>
 
@@ -189,7 +241,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.visibility_km || 5} km</span>
-              <p className="text-[11px] text-slate-400 mt-0.5">Clear Line-of-Sight</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{isHi ? 'स्पष्ट दृष्टि रेखा' : 'Clear Line-of-Sight'}</p>
             </div>
           </div>
 
@@ -201,7 +253,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.uv_index || 6.5}</span>
-              <p className="text-[11px] text-orange-500 mt-0.5">Moderate Exposure</p>
+              <p className="text-[11px] text-orange-500 mt-0.5">{isHi ? 'मध्यम जोखिम' : 'Moderate Exposure'}</p>
             </div>
           </div>
 
@@ -213,7 +265,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.air_quality_aqi || 85}</span>
-              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">Satisfactory</p>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">{isHi ? 'संतोषजनक' : 'Satisfactory'}</p>
             </div>
           </div>
 
@@ -225,7 +277,7 @@ export const WeatherDashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{currentWeather?.cloud_cover_pct || 60}%</span>
-              <p className="text-[11px] text-slate-400 mt-0.5">Convective Cloud Deck</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{isHi ? 'संवाहक बादल आवरण' : 'Convective Cloud Deck'}</p>
             </div>
           </div>
         </div>
@@ -239,11 +291,11 @@ export const WeatherDashboard: React.FC = () => {
               {t.forecast_7day}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              IMD Synoptic Ensemble & High-Resolution NWP Guidance
+              {isHi ? 'आईएमडी सिनॉप्टिक एन्सेम्बल और उच्च-रिज़ॉल्यूशन एनडब्ल्यूपी मार्गदर्शन' : 'IMD Synoptic Ensemble & High-Resolution NWP Guidance'}
             </p>
           </div>
           <span className="text-xs px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold">
-            Daily Timeline
+            {isHi ? 'दैनिक समयरेखा' : 'Daily Timeline'}
           </span>
         </div>
 
@@ -257,7 +309,7 @@ export const WeatherDashboard: React.FC = () => {
                   : 'bg-slate-50/70 dark:bg-slate-950/60 border-slate-200/80 dark:border-slate-800/80 text-slate-800 dark:text-slate-200'
               }`}
             >
-              <div className="text-xs font-bold">{df.day_name}</div>
+              <div className="text-xs font-bold">{translateDay(df.day_name)}</div>
               <p className="text-[10px] text-slate-400 font-medium">{df.date.substring(5)}</p>
 
               <div className="my-1">
@@ -270,7 +322,7 @@ export const WeatherDashboard: React.FC = () => {
               </div>
 
               <div className="text-[10px] text-blue-600 dark:text-cyan-400 font-bold">
-                💧 {df.precipitation_prob_pct}% rain
+                💧 {df.precipitation_prob_pct}% {isHi ? 'वर्षा' : 'rain'}
               </div>
             </div>
           ))}
