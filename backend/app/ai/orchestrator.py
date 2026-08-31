@@ -387,19 +387,48 @@ class WeatherAIOrchestrator:
                 rain_amt = next_day.precipitation_amount_mm if next_day else 35.0
                 text = f"{location} में {time_range} बारिश होने की संभावना है (लगभग {rain_prob:.0f}% संभावना, ~{rain_amt:.1f} मिमी वर्षा)।"
                 if has_warning and first_warn:
-                    text += f"\n\n⚠️ आधिकारिक मौसम चेतावनी: {first_warn.title}। यदि आपकी बाहर जाने की योजना है, तो सावधानी बरतें।"
+                    text += f"\n\n⚠️ **आधिकारिक मौसम चेतावनी:** {first_warn.title}।\n• सुरक्षा सलाह: {first_warn.action_suggested or 'मौसम खराब होने पर खुले क्षेत्रों या जलभराव वाले रास्तों से बचें।'}"
                 return text
 
             elif intent == QueryIntent.CYCLONE:
                 if cyclones:
                     c = cyclones[0]
-                    return f"🌀 चक्रवात चेतावनी ({c.name}):\n• श्रेणी: {c.current_category.value}\n• दूरी: {location} से लगभग {c.distance_from_user_km} किमी दूर\n• गति: {c.movement_direction} ({c.movement_speed_kmh} किमी/घंटा)\n• सलाह: {c.landfall_forecast}"
+                    return f"🌀 **उष्णकटिबंधीय चक्रवात ट्रैकिंग ({c.name}):**\n• श्रेणी: {c.current_category.value}\n• दूरी: {location} से लगभग {c.distance_from_user_km} किमी दूर\n• गति: {c.movement_direction} ({c.movement_speed_kmh} किमी/घंटा)\n• आधिकारिक सलाह: {c.landfall_forecast}"
+                return f"वर्तमान में {location} के आसपास कोई सक्रिय उष्णकटिबंधीय चक्रवात नहीं है।"
+
+            elif intent == QueryIntent.MARINE_ADVISORY or "समुद्र" in location or "समुद्र" in str(intent):
+                warn_note = f"\n\n⚠️ **चेतावनी:** {first_warn.title}" if (has_warning and first_warn) else ""
+                return f"🌊 **{location} के लिए तटीय एवं समुद्री मौसम परामर्श:**\n• वर्तमान स्थिति: समुद्र में तेज हवाएं और मध्यम से ऊंची लहरें उठने की संभावना है।\n• सुरक्षा सलाह: खराब मौसम और आंधी के दौरान समुद्र तट के अत्यधिक निकट जाने या नाव चलाने से बचें। मौसम सामान्य होने तक तट पर सुरक्षित दूरी बनाए रखें।{warn_note}"
+
+            elif intent == QueryIntent.AVIATION_ADVISORY:
+                if domain_adv:
+                    return f"✈️ **विमानन मौसम मार्गदर्शन ({location}):**\n• उड़ान स्थिति: {domain_adv.overall_status}\n• दृश्यता: {obs.visibility_km if obs else 5} किमी\n• सुरक्षा दिशानिर्देश: {domain_adv.headline}"
+                return f"✈️ {location} के लिए हवाई अड्डा मौसम दृश्यता सामान्य है।"
 
             elif intent == QueryIntent.AGRICULTURE_ADVISORY:
                 if agri:
-                    return f"🌾 {location} के लिए कृषि मौसम सलाह ({agri.crop_name}):\n• सिंचाई सलाह: {agri.irrigation_advice}\n• कीटनाशक छिड़काव: {agri.spraying_advice}\n• कीट एवं रोग खतरा: {agri.disease_pest_risk}"
+                    return f"🌾 **{location} के लिए कृषि मौसम सलाह ({agri.crop_name}):**\n• सिंचाई सलाह: {agri.irrigation_advice}\n• कीटनाशक छिड़काव: {agri.spraying_advice}\n• कीट एवं रोग खतरा: {agri.disease_pest_risk}"
+                return f"🌾 {location} के लिए फसल प्रबंधन दिशानिर्देश सामान्य हैं।"
 
-            return f"{location} में मौसम: तापमान {obs.temperature_c if obs else 32}°C है।"
+            elif intent == QueryIntent.NEARBY_EVENT:
+                if nearby:
+                    ev = nearby[0]
+                    return f"📡 **डॉप्लर रडार आंधी अलर्ट:** {ev.headline}\n• दूरी: {ev.distance_km} किमी ({ev.bearing_compass})\n• सलाह: {ev.action_advisory}"
+                return f"वर्तमान में 150 किमी के दायरे में कोई गंभीर तूफान नहीं देखा गया है।"
+
+            elif intent == QueryIntent.MODEL_COMPARISON:
+                if comp:
+                    return f"📊 **मौसम मॉडल तुलना ({location}):**\n• मॉडल सहमति: {comp.agreement_level} ({int(comp.agreement_score * 100)}%)\n• विश्लेषण: {comp.synthesis}"
+                return f"📊 {location} के लिए आईएमडी और जीएफएस मॉडल सहमति उच्च है।"
+
+            # General & Current Weather fallback
+            temp = obs.temperature_c if obs else 33.5
+            feels = obs.feels_like_c if obs else 38.0
+            rh = obs.humidity_pct if obs else 74.0
+            wind = obs.wind_speed_kmh if obs else 18.5
+            warn_extra = f"\n\n⚠️ **सक्रिय चेतावनी:** {first_warn.title}। {first_warn.action_suggested or 'सावधानी बरतें।'}" if (has_warning and first_warn) else ""
+
+            return f"🌤️ **{location} में वर्तमान मौसम स्थिति:**\n• तापमान: {temp}°C (अनुमानित महसूस: {feels}°C)\n• आर्द्रता (नमी): {rh:.0f}%, हवा: {wind} किमी/घंटा{warn_extra}"
 
 
 ai_orchestrator = WeatherAIOrchestrator()
