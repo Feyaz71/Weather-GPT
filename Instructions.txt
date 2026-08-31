@@ -1,0 +1,2371 @@
+====================================================================
+WEATHERGPT
+AI-POWERED WEATHER INTELLIGENCE & DECISION-SUPPORT PLATFORM
+MASTER PRODUCT IMPLEMENTATION DIRECTIVE
+====================================================================
+
+ROLE
+
+You are acting as the lead software architect, senior backend engineer,
+senior frontend engineer, AI/ML engineer, GIS engineer, DevOps engineer,
+QA engineer, and product designer for this project.
+
+Your task is to transform the existing WeatherGPT repository into a
+complete, professional, production-grade weather intelligence platform.
+
+IMPORTANT:
+
+Do not treat this as a simple chatbot project.
+
+Do not treat this as a dashboard mockup.
+
+Do not treat this as a hackathon prototype.
+
+Build WeatherGPT as a serious, scalable meteorological intelligence
+and decision-support product.
+
+====================================================================
+0. AUTHORITATIVE REQUIREMENTS
+====================================================================
+
+Before making architectural or implementation decisions, inspect and
+understand:
+
+1. WeatherGPT System Design & Architecture
+2. WeatherGPT Software Requirements Specification (SRS)
+3. WeatherGPT API Keys & Official Links document
+4. Existing repository
+5. Existing implementation
+6. Existing tests and documentation
+
+The supplied System Design and SRS define the intended product scope.
+
+The API Keys & Official Links document defines the selected external
+weather-data ecosystem and recommended source roles.
+
+Do not silently remove requirements from these documents.
+
+Do not replace requirements with a smaller "MVP" unless explicitly
+instructed.
+
+If the existing implementation conflicts with the documented
+architecture, identify the conflict and refactor it cleanly.
+
+====================================================================
+1. PRODUCT VISION
+====================================================================
+
+WeatherGPT is an AI-powered conversational weather intelligence and
+decision-support platform.
+
+It must combine:
+
+- authoritative meteorological observations
+- official warnings
+- weather forecasts
+- numerical weather prediction
+- satellite information
+- historical/reanalysis data
+- geospatial intelligence
+- weather-risk analysis
+- climate analytics
+- agricultural intelligence
+- domain-specific decision support
+- multilingual conversational AI
+- voice interaction
+- real-time alerting
+
+The product transformation is:
+
+RAW DATA
+   ↓
+DATA VALIDATION
+   ↓
+DATA NORMALIZATION
+   ↓
+DATA FUSION
+   ↓
+METEOROLOGICAL CONTEXT
+   ↓
+RISK / INTELLIGENCE
+   ↓
+UNCERTAINTY
+   ↓
+EXPLANATION
+   ↓
+ACTIONABLE DECISION SUPPORT
+   ↓
+MULTILINGUAL TEXT / VOICE / GIS / ALERT
+
+The LLM is an orchestration and explanation layer.
+
+The LLM is NOT the source of meteorological truth.
+
+====================================================================
+2. ABSOLUTE PRODUCT RULES
+====================================================================
+
+Never fabricate:
+
+- weather observations
+- forecasts
+- warnings
+- cyclone tracks
+- radar observations
+- model outputs
+- satellite observations
+- historical statistics
+- official advisories
+- API responses
+
+If real data is unavailable:
+
+show an explicit unavailable/stale state.
+
+Never present synthetic/fallback data as live official data.
+
+Never claim that a source was consulted if it was not actually
+consulted.
+
+Never claim IMD authority for non-IMD data.
+
+Never convert an AI-generated interpretation into an "official warning".
+
+====================================================================
+3. NO HACKATHON PRESENTATION
+====================================================================
+
+The user-facing product must NEVER display:
+
+SIH
+Smart India Hackathon
+Hackathon
+SIH 2026
+Prototype
+Demo
+Judge
+Evaluation
+Hackathon Mode
+
+The application must look like an independent commercial/enterprise
+weather intelligence product.
+
+The product should be credible to:
+
+- citizens
+- farmers
+- researchers
+- disaster managers
+- government users
+- aviation professionals
+- marine users
+- urban planners
+- businesses
+- travelers
+
+====================================================================
+4. CORE SYSTEM ARCHITECTURE
+====================================================================
+
+Implement the following logical architecture:
+
+USER
+ │
+ ├── TEXT
+ └── VOICE
+      ↓
+LANGUAGE DETECTION
+      ↓
+INTENT + ENTITY + TIME + LOCATION + DOMAIN EXTRACTION
+      ↓
+CONVERSATIONAL CONTEXT
+      ↓
+QUERY PLANNER
+      ↓
+SOURCE / TOOL SELECTION
+      ↓
+DATA PROVIDERS
+      ↓
+DATA INGESTION
+      ↓
+NORMALIZATION
+      ↓
+VALIDATION
+      ↓
+FRESHNESS CHECK
+      ↓
+DATA FUSION
+      ↓
+METEOROLOGICAL INTELLIGENCE
+      ↓
+RISK ANALYSIS
+      ↓
+MODEL AGREEMENT / UNCERTAINTY
+      ↓
+EXPLAINABILITY
+      ↓
+GROUNDED RESPONSE GENERATION
+      ↓
+LOCALIZATION
+      ↓
+TEXT / VOICE / MAP / ALERT
+
+Keep each layer modular.
+
+Do not put business logic directly inside React components.
+
+Do not put provider-specific API logic inside the LLM layer.
+
+Do not couple language processing to weather calculations.
+
+====================================================================
+5. DATA SOURCE ECOSYSTEM
+====================================================================
+
+Implement provider abstractions for the selected sources:
+
+1. IMD
+2. MOSDAC / ISRO
+3. NOAA / NCEI / GFS
+4. ERA5 / Copernicus CDS
+5. OpenWeather
+6. Open-Meteo
+7. WeatherAPI.com
+8. NASA POWER
+
+The source document defines these selected sources and their intended
+roles. Preserve this architecture. 
+
+Recommended source roles:
+
+IMD
+- official Indian weather forecasts
+- official warnings
+- nowcasts
+- cyclone information
+- rainfall information
+- Indian meteorological observations
+
+MOSDAC / ISRO
+- satellite products
+- meteorological products
+- oceanographic products
+
+NOAA
+- global observations
+- GFS/NWP
+- independent model source
+
+ERA5 / Copernicus
+- historical climate
+- reanalysis
+- long-term trends
+
+OpenWeather
+- application-level current weather
+- forecast
+
+Open-Meteo
+- no-key forecast
+- multi-model forecast
+- development/fallback source
+
+WeatherAPI
+- current weather
+- forecast
+- historical
+- alerts where available
+
+NASA POWER
+- historical/environmental data
+- agriculture
+- solar
+- climate analytics
+
+====================================================================
+6. PROVIDER ARCHITECTURE
+====================================================================
+
+Create a common provider contract.
+
+Example conceptual interface:
+
+WeatherProvider
+
+    get_current_weather()
+    get_forecast()
+    get_historical()
+    get_alerts()
+    get_observations()
+    get_metadata()
+    health_check()
+
+Additional specialized interfaces may be created for:
+
+NWPProvider
+SatelliteProvider
+ClimateProvider
+AlertProvider
+AgricultureProvider
+MarineProvider
+
+Implement adapters such as:
+
+IMDProvider
+MOSDACProvider
+NOAAProvider
+GFSProvider
+ERA5Provider
+OpenWeatherProvider
+OpenMeteoProvider
+WeatherAPIProvider
+NASAPowerProvider
+
+Provider-specific logic must remain inside provider modules.
+
+====================================================================
+7. SOURCE ROUTER
+====================================================================
+
+Implement a Source Router / Provider Registry.
+
+The system must NOT call every API for every request.
+
+The Query Planner should determine the required data.
+
+Examples:
+
+"Is there an official warning in my district?"
+
+→ prioritize IMD.
+
+"What is the 20-year temperature trend?"
+
+→ ERA5 / NOAA / NASA POWER / appropriate historical sources.
+
+"Compare IMD and GFS."
+
+→ IMD + GFS.
+
+"Show satellite weather."
+
+→ MOSDAC / supported satellite source.
+
+"Give current application-level weather."
+
+→ appropriate current-weather provider.
+
+The router must understand:
+
+- data type
+- authority
+- geography
+- temporal range
+- freshness
+- provider availability
+- cost
+- rate limits
+- reliability
+
+====================================================================
+8. SOURCE AUTHORITY
+====================================================================
+
+Maintain source authority metadata.
+
+Example:
+
+OFFICIAL_WARNING
+OFFICIAL_OBSERVATION
+MODEL_FORECAST
+THIRD_PARTY_FORECAST
+HISTORICAL_REANALYSIS
+AI_INTERPRETATION
+
+When multiple sources disagree:
+
+do not silently choose one.
+
+Expose:
+
+- source
+- disagreement
+- model agreement
+- uncertainty
+- timestamp
+- validity
+
+Official warnings must have higher authority than AI interpretation.
+
+====================================================================
+9. DATA NORMALIZATION
+====================================================================
+
+Every provider must normalize into a common internal schema.
+
+Example conceptual structure:
+
+WeatherObservation
+
+    location
+    coordinates
+    temperature
+    feels_like
+    humidity
+    pressure
+    wind_speed
+    wind_direction
+    wind_gust
+    rainfall
+    visibility
+    cloud_cover
+    uv
+    aqi
+    observed_at
+    retrieved_at
+    source
+
+Forecast:
+
+ForecastPoint
+
+    location
+    valid_from
+    valid_until
+    temperature
+    precipitation_probability
+    precipitation_amount
+    wind
+    humidity
+    pressure
+    visibility
+    source
+    model
+    retrieved_at
+
+Warning:
+
+WeatherWarning
+
+    event_id
+    hazard
+    severity
+    location
+    issued_at
+    valid_from
+    valid_until
+    source
+    geometry
+    instructions
+
+Make schemas extensible.
+
+====================================================================
+10. FRESHNESS
+====================================================================
+
+Every weather response should expose freshness.
+
+Maintain:
+
+observed_at
+issued_at
+retrieved_at
+valid_from
+valid_until
+
+The UI should communicate:
+
+Live
+Recently updated
+Stale
+Unavailable
+
+Do not call stale data "live".
+
+====================================================================
+11. NWP
+====================================================================
+
+Support numerical weather prediction.
+
+Architecture must support:
+
+- IMD models/data where available
+- NOAA GFS
+- WRF
+- additional models in future
+
+WRF must only be shown when actual WRF output exists.
+
+Never fabricate WRF output.
+
+Implement model comparison.
+
+Example:
+
+IMD → Rain
+GFS → Rain
+WRF → Rain
+
+Model Agreement:
+High
+
+Or:
+
+IMD → Rain
+GFS → Rain
+WRF → No significant rainfall
+
+Model Agreement:
+Low
+
+Expose uncertainty instead of pretending certainty.
+
+====================================================================
+12. RISK ENGINES
+====================================================================
+
+Implement deterministic intelligence engines.
+
+At minimum:
+
+RainRiskEngine
+HeatRiskEngine
+ThunderstormRiskEngine
+WindRiskEngine
+FloodRiskEngine
+TravelRiskEngine
+AgricultureRiskEngine
+OutdoorRiskEngine
+ModelAgreementEngine
+
+Risk levels:
+
+Low
+Moderate
+High
+Severe
+
+Each risk result must include:
+
+risk_level
+score where scientifically justified
+factors
+source data
+timestamp
+confidence/uncertainty
+
+Do not create arbitrary scores.
+
+Document formulas and thresholds.
+
+====================================================================
+13. NEARBY WEATHER & DISASTER INTELLIGENCE
+====================================================================
+
+Implement nearby-event intelligence.
+
+Default radius:
+
+100 km
+
+Make configurable.
+
+For each nearby event where data supports it:
+
+distance
+bearing
+direction
+movement
+track
+severity
+status
+
+Classify:
+
+DIRECT WARNING
+NEARBY — POTENTIAL RELEVANCE
+NEARBY — AWARENESS
+
+CRITICAL:
+
+A nearby cyclone/thunderstorm/flood event must NOT automatically
+become a warning for the user.
+
+"Nearby event" and "user is under warning" are different states.
+
+Official warning polygons take precedence.
+
+====================================================================
+14. CYCLONE INTELLIGENCE
+====================================================================
+
+Where authoritative data is available, support:
+
+- cyclone location
+- track
+- direction
+- movement
+- wind
+- pressure
+- severity
+- forecast track
+- distance from user
+- estimated relevance
+
+Clearly distinguish:
+
+current position
+forecast position
+historical track
+
+Do not extrapolate a track without explicitly marking it as a model
+or derived estimate.
+
+====================================================================
+15. GIS PLATFORM
+====================================================================
+
+Build a serious GIS experience.
+
+Support layers where actual data is available:
+
+- temperature
+- rainfall
+- wind
+- warnings
+- cyclone tracks
+- radar
+- lightning
+- flood risk
+- weather stations
+- forecast grids
+- event locations
+- satellite layers
+
+Use:
+
+Leaflet or Mapbox
+PostGIS
+
+Implement:
+
+- layer control
+- legend
+- search
+- station inspection
+- warning polygons
+- event details
+- location selection
+- map-to-dashboard interaction
+
+Desktop:
+
+map + contextual side panel.
+
+Mobile:
+
+map + expandable details.
+
+Do not let map controls overlap important UI.
+
+====================================================================
+16. WEATHER STATIONS
+====================================================================
+
+Support station-level intelligence.
+
+Station card should be able to show:
+
+station name
+location
+distance
+temperature
+humidity
+pressure
+wind
+rainfall
+observation time
+source
+freshness
+
+Never show a station as active if its data is stale without indication.
+
+====================================================================
+17. CLIMATE INTELLIGENCE
+====================================================================
+
+Implement historical and climate analytics.
+
+Support:
+
+- temperature trends
+- rainfall trends
+- anomalies
+- seasonal comparison
+- year-over-year comparison
+- long-term trend
+- variability
+- historical extremes
+
+Example query:
+
+"What has Delhi's temperature trend been over the last 20 years?"
+
+Response should include:
+
+period
+dataset
+method
+trend
+uncertainty/limitations
+visualization
+
+Never imply causation from simple correlation/trend.
+
+====================================================================
+18. SEASONAL / EXTENDED OUTLOOK
+====================================================================
+
+Support seasonal and extended outlooks where authoritative data exists.
+
+Clearly distinguish:
+
+Short-term forecast
+Extended forecast
+Seasonal outlook
+
+Do NOT present seasonal probabilities as exact daily forecasts.
+
+====================================================================
+19. AGRICULTURAL INTELLIGENCE
+====================================================================
+
+Build an extensible agricultural advisory framework.
+
+Inputs:
+
+Location
+Crop
+Growth stage
+Time period
+
+Outputs may include:
+
+Weather context
+Rainfall outlook
+Temperature
+Irrigation considerations
+Spraying considerations
+Disease/weather risk
+Farming operation timing
+Official agricultural advisory
+AI interpretation
+
+Always distinguish:
+
+OFFICIAL ADVISORY
+
+from:
+
+AI INTERPRETATION
+
+Never fabricate agricultural recommendations.
+
+====================================================================
+20. DOMAIN DECISION SUPPORT
+====================================================================
+
+Create an extensible domain advisory framework for:
+
+Agriculture
+Aviation
+Marine
+Urban Planning
+Travel
+Outdoor Activities
+Disaster Management
+
+Do not build each domain as an isolated application.
+
+Use reusable:
+
+Domain
+→ Inputs
+→ Weather factors
+→ Risk rules
+→ Recommendation engine
+→ Sources
+→ Explanation
+
+====================================================================
+21. CONVERSATIONAL AI
+====================================================================
+
+The AI must function as a weather intelligence orchestrator.
+
+It should:
+
+- understand user intent
+- extract location
+- extract time range
+- extract weather parameters
+- identify domain
+- select tools
+- retrieve data
+- interpret structured results
+- explain factors
+- respond in user's language
+
+The LLM must not directly invent weather facts.
+
+====================================================================
+22. STRUCTURED INTENT
+====================================================================
+
+Every query should resolve into language-neutral structured intent.
+
+Example:
+
+{
+  "intent": "forecast",
+  "location": "Delhi",
+  "time_range": {
+      "type": "tomorrow_evening"
+  },
+  "parameters": [
+      "rain_probability",
+      "rainfall"
+  ],
+  "domain": "general_weather"
+}
+
+Other intents should include:
+
+CURRENT_WEATHER
+FORECAST
+WARNING
+NEARBY_EVENT
+CYCLONE
+NWP_COMPARISON
+CLIMATE
+HISTORICAL
+AGRICULTURE
+TRAVEL
+AVIATION
+MARINE
+URBAN
+OUTDOOR
+LOCATION
+GENERAL_WEATHER
+
+Make intent system extensible.
+
+====================================================================
+23. MULTI-TURN CONTEXT
+====================================================================
+
+Support contextual queries.
+
+Example:
+
+User:
+"What will the weather be tomorrow in Delhi?"
+
+Assistant:
+...
+
+User:
+"What about evening?"
+
+System must inherit:
+
+location = Delhi
+time = tomorrow
+
+Only update time.
+
+Support conversational inheritance for:
+
+location
+time
+weather parameter
+domain
+crop
+event
+
+Do not lose context unnecessarily.
+
+====================================================================
+24. FULL MULTILINGUAL ARCHITECTURE
+====================================================================
+
+THIS IS A CORE REQUIREMENT.
+
+Do NOT implement only English + Hindi.
+
+WeatherGPT must have a language-agnostic architecture.
+
+Support a broad Indian-language framework including:
+
+English
+Hindi
+Bengali
+Telugu
+Marathi
+Tamil
+Gujarati
+Urdu
+Kannada
+Malayalam
+Punjabi
+Odia
+Assamese
+
+Architecture must allow additional Indian languages without rewriting
+the core system.
+
+Create:
+
+LanguageDetector
+LocaleService
+TranslationService
+MultilingualLLMProvider
+SpeechToTextProvider
+TextToSpeechProvider
+
+====================================================================
+25. LANGUAGE-INDEPENDENT WEATHER ENGINE
+====================================================================
+
+This is critical.
+
+The weather intelligence engine must NEVER contain:
+
+if language == "hindi"
+if language == "tamil"
+if language == "bengali"
+
+etc.
+
+The pipeline must be:
+
+Any Language
+ ↓
+Language Detection
+ ↓
+Semantic Intent
+ ↓
+Language-Neutral Intent
+ ↓
+Weather Data
+ ↓
+Weather Intelligence
+ ↓
+Localized Response
+
+Weather calculations are language-independent.
+
+====================================================================
+26. NATIVE LANGUAGE UI
+====================================================================
+
+Language selector should display native names.
+
+Examples:
+
+English
+हिन्दी
+বাংলা
+తెలుగు
+मराठी
+தமிழ்
+ગુજરાતી
+اردو
+ಕನ್ನಡ
+മലയാളം
+ਪੰਜਾਬੀ
+ଓଡ଼ିଆ
+অসমীয়া
+
+Use a searchable language picker.
+
+Do not permanently occupy large screen space with a language list.
+
+====================================================================
+27. CODE-SWITCHING
+====================================================================
+
+Support:
+
+English
+Hindi
+Hinglish
+mixed-language queries
+regional-language + English queries
+
+Examples:
+
+"Kal Delhi ka weather kaisa rahega?"
+
+"Delhi mein tomorrow rain chance kitna hai?"
+
+"Kal evening baarish hogi?"
+
+The user should not be forced to speak grammatically pure language.
+
+====================================================================
+28. AUTOMATIC LANGUAGE DETECTION
+====================================================================
+
+Detect language automatically where possible.
+
+If the user changes language during conversation:
+
+adapt.
+
+If a manual preferred language is selected:
+
+respect it.
+
+Maintain:
+
+preferred_language
+preferred_voice_language
+locale
+units
+
+====================================================================
+29. WEATHER TERMINOLOGY
+====================================================================
+
+Do not perform naive word-for-word translation.
+
+Create a meteorological terminology layer.
+
+Examples:
+
+Temperature
+Humidity
+Pressure
+Visibility
+Rainfall
+Wind
+Thunderstorm
+Lightning
+Heatwave
+Cold Wave
+Heavy Rainfall
+Cyclone
+Flood
+Fog
+Hailstorm
+Dust Storm
+Squall
+Warning
+Watch
+Advisory
+
+Terminology should be reusable across:
+
+UI
+AI
+alerts
+notifications
+voice
+maps
+charts
+
+====================================================================
+30. RTL
+====================================================================
+
+Support RTL languages such as Urdu.
+
+The UI must dynamically handle:
+
+LTR
+RTL
+
+Correctly handle:
+
+navigation
+chat
+forms
+drawers
+alignment
+spacing
+icons where appropriate
+
+====================================================================
+31. VOICE
+====================================================================
+
+Voice must be a first-class product capability.
+
+Pipeline:
+
+MICROPHONE
+ ↓
+MULTILINGUAL STT
+ ↓
+LANGUAGE DETECTION
+ ↓
+INTENT
+ ↓
+WEATHER INTELLIGENCE
+ ↓
+LOCALIZED RESPONSE
+ ↓
+MULTILINGUAL TTS
+
+Create provider abstractions.
+
+Potential integrations:
+
+Bhashini-compatible provider
+Cloud STT/TTS providers
+Browser fallback where supported
+
+Do not tightly couple the architecture to one provider.
+
+====================================================================
+32. BASHINI
+====================================================================
+
+Design the voice and translation architecture so Bhashini can be
+integrated cleanly.
+
+Create:
+
+BhashiniProvider
+
+for applicable:
+
+translation
+STT
+TTS
+
+Do not make the entire application dependent on Bhashini.
+
+====================================================================
+33. NOTIFICATIONS
+====================================================================
+
+Implement alert architecture for:
+
+- in-app notifications
+- push notifications
+
+Design extensibility for:
+
+SMS
+other notification channels
+
+Notification payload:
+
+event_id
+hazard
+severity
+location
+language
+title
+message
+source
+issued_at
+valid_until
+
+Deduplicate repeated warning updates.
+
+====================================================================
+34. FRONTEND PRODUCT DESIGN
+====================================================================
+
+The frontend must be redesigned as a polished professional product.
+
+Technology may remain:
+
+React
+TypeScript
+Vite
+Tailwind
+
+Create a proper reusable design system.
+
+Do NOT build it like a generic admin dashboard.
+
+Do NOT build it like a ChatGPT clone.
+
+Do NOT use excessive gradients.
+
+Do NOT use excessive rounded cards.
+
+Do NOT make every component look like a floating card.
+
+Use:
+
+clean hierarchy
+professional typography
+scientific visual language
+clear spacing
+subtle elevation
+strong information hierarchy
+semantic color usage
+
+====================================================================
+35. DESKTOP-FIRST
+====================================================================
+
+Desktop layout is a critical requirement.
+
+Explicitly test:
+
+1920×1080
+1440×900
+1280×800
+
+There must be:
+
+NO horizontal scrolling
+NO overlapping components
+NO distorted cards
+NO mobile layout squeezed into desktop
+NO chart overflow
+NO map overflow
+NO broken navigation
+NO clipped text
+NO floating elements covering essential information
+
+Use proper:
+
+CSS Grid
+Flexbox
+responsive breakpoints
+container widths
+min/max constraints
+
+Large screens must actually use available space.
+
+====================================================================
+36. RESPONSIVE
+====================================================================
+
+Support:
+
+Desktop
+Laptop
+Tablet
+Mobile
+
+Do not merely shrink the desktop UI.
+
+Create intentional responsive layouts.
+
+Desktop:
+multi-column information architecture.
+
+Tablet:
+reduced columns.
+
+Mobile:
+stacked content
+bottom navigation where appropriate
+collapsible sections.
+
+====================================================================
+37. APPLICATION SHELL
+====================================================================
+
+Create:
+
+Sidebar
+Top Header
+Main Content
+Responsive Mobile Navigation
+
+Navigation should include:
+
+Overview
+Forecast
+Weather Map
+Alerts
+Nearby Events
+AI Assistant
+Agriculture
+Climate
+Locations
+Settings
+
+Sidebar should be collapsible.
+
+====================================================================
+38. THEME SYSTEM
+====================================================================
+
+Implement:
+
+Light
+Dark
+System
+
+Persist user preference.
+
+Dark mode must have:
+
+proper surface hierarchy
+correct chart contrast
+correct map styling
+readable alerts
+accessible controls
+
+Do not make dark mode simply:
+
+black background + white text.
+
+====================================================================
+39. COLOR SYSTEM
+====================================================================
+
+Use restrained professional weather-inspired colors.
+
+Semantic colors:
+
+Normal
+Information
+Rain
+Warning
+Severe
+Success
+
+Do not rely on color alone.
+
+Use:
+
+icon
+label
+severity
+color
+
+for accessibility.
+
+Avoid neon-heavy visual design.
+
+====================================================================
+40. OVERVIEW DASHBOARD
+====================================================================
+
+The Overview screen should communicate immediately:
+
+Current location
+Current temperature
+Feels like
+Humidity
+Pressure
+Wind
+Gust
+Visibility
+Rainfall
+UV
+AQI where available
+Current warnings
+Hourly forecast
+7-day forecast
+Model agreement
+Weather risk
+
+Also show:
+
+Data source
+Last updated
+Freshness
+
+====================================================================
+41. FORECAST EXPERIENCE
+====================================================================
+
+Create dedicated forecast views:
+
+Hourly
+Daily
+Extended where available
+
+Include:
+
+temperature
+precipitation probability
+precipitation amount
+wind
+humidity
+pressure
+visibility
+warnings
+
+Charts must be responsive and readable.
+
+====================================================================
+42. AI WEATHER ASSISTANT
+====================================================================
+
+The assistant must NOT feel like a generic AI chatbot.
+
+It is a Weather Intelligence Assistant.
+
+Response structure should support:
+
+Answer
+Forecast / Data
+Risk
+Why
+Sources
+Freshness
+Uncertainty where applicable
+
+Example:
+
+ANSWER
+
+Rain is likely tomorrow evening.
+
+PRECIPITATION
+78%
+
+RISK
+Moderate
+
+WHY
+- forecast precipitation signal
+- recent observations
+- model agreement
+- active warning status
+
+SOURCE
+IMD
+
+UPDATED
+X minutes ago
+
+Do not expose hidden chain-of-thought.
+
+Only provide concise evidence/factors.
+
+====================================================================
+43. SOURCE TRANSPARENCY
+====================================================================
+
+Users should be able to understand:
+
+Where the information came from
+When it was retrieved
+Whether it is observation or forecast
+Which model was used
+Whether multiple sources agree
+
+Create a clean source/freshness presentation.
+
+Do not overwhelm the user with technical metadata by default.
+
+Use expandable details.
+
+====================================================================
+44. ALERT CENTER
+====================================================================
+
+Create a dedicated Alert Center.
+
+Support:
+
+severity
+hazard
+location
+source
+issued time
+validity
+status
+
+Severity levels should be visually obvious.
+
+Official warning must be clearly identified as official.
+
+Allow location-based alert subscriptions.
+
+====================================================================
+45. SEARCH & LOCATION
+====================================================================
+
+Global search must support:
+
+city
+district
+state
+coordinates
+landmarks where supported
+
+Support:
+
+English names
+native names
+transliterations
+aliases
+
+Normalize to canonical geographic entities.
+
+====================================================================
+46. ACCESSIBILITY
+====================================================================
+
+Implement:
+
+keyboard navigation
+ARIA
+screen reader support
+focus states
+contrast
+larger text support
+reduced motion
+voice interaction
+
+Do not rely on color alone.
+
+====================================================================
+47. PERFORMANCE
+====================================================================
+
+Optimize:
+
+route-level code splitting
+lazy map loading
+lazy chart loading
+API caching
+debounced search
+memoization
+virtualized lists where required
+
+Do not put all heavy libraries in the initial bundle.
+
+====================================================================
+48. BACKEND
+====================================================================
+
+Maintain/improve:
+
+FastAPI
+Pydantic
+PostgreSQL
+PostGIS
+Redis
+WebSocket
+background workers
+
+Prefer a modular monolith unless there is a real reason for
+microservices.
+
+The architecture must be horizontally scalable.
+
+====================================================================
+49. DATABASE
+====================================================================
+
+Create appropriate persistence models for:
+
+users
+locations
+weather_stations
+weather_observations
+weather_forecasts
+nwp_forecasts
+weather_warnings
+weather_events
+historical_weather
+seasonal_outlooks
+advisories
+chat_sessions
+chat_messages
+alert_subscriptions
+audit_logs
+
+Preserve:
+
+source
+timestamps
+validity
+metadata
+provenance
+
+====================================================================
+50. CACHING
+====================================================================
+
+Use Redis where available.
+
+Provide safe fallback caching only for development.
+
+Cache based on:
+
+provider
+location
+data type
+time range
+
+Respect provider TTL and freshness.
+
+Never allow caching to make stale data appear live.
+
+====================================================================
+51. REAL-TIME
+====================================================================
+
+Use WebSockets where appropriate for:
+
+warning updates
+alert streams
+live weather updates
+event updates
+
+Implement reconnection logic.
+
+Avoid duplicate event delivery.
+
+====================================================================
+52. SECURITY
+====================================================================
+
+Implement:
+
+authentication
+authorization
+JWT/OAuth-compatible design
+input validation
+rate limiting
+CORS
+secret management
+audit logging
+
+Never expose API keys in frontend code.
+
+Never commit secrets.
+
+All provider credentials must come from:
+
+environment variables
+secret manager
+
+====================================================================
+53. API CREDENTIAL ARCHITECTURE
+====================================================================
+
+Provider credentials may include:
+
+IMD credentials
+MOSDAC account/authentication
+Copernicus CDS token
+OpenWeather API key
+WeatherAPI API key
+
+Some providers may not require conventional API keys.
+
+Use provider-specific environment configuration.
+
+Example:
+
+IMD_*
+MOSDAC_*
+COPERNICUS_*
+OPENWEATHER_API_KEY
+WEATHERAPI_KEY
+NOAA_*
+NASA_*
+
+Never hard-code credentials.
+
+Before production deployment, verify current provider documentation,
+authentication requirements, quotas and access policies.
+
+====================================================================
+54. PROVIDER FAILURE HANDLING
+====================================================================
+
+If IMD fails:
+
+do not fabricate IMD data.
+
+If another approved source is available:
+
+use it where appropriate.
+
+Clearly identify the source.
+
+If all relevant sources fail:
+
+return an explicit unavailable state.
+
+If data is stale:
+
+show stale status.
+
+The UI must gracefully handle:
+
+timeout
+rate limit
+authentication failure
+provider unavailable
+partial response
+malformed response
+network failure
+
+====================================================================
+55. OBSERVABILITY
+====================================================================
+
+Implement operational monitoring for:
+
+API latency
+p50
+p95
+provider latency
+provider failures
+ingestion health
+stale feeds
+LLM failures
+tool failures
+WebSocket connections
+alert delivery
+cache performance
+
+Provide:
+
+/health
+/readiness
+
+Use structured logging.
+
+====================================================================
+56. AI SAFETY / GROUNDING
+====================================================================
+
+LLM prompts must enforce:
+
+Use only retrieved weather facts.
+
+Do not invent values.
+
+Do not invent warnings.
+
+Do not invent source citations.
+
+Do not convert uncertainty into certainty.
+
+Do not give false precision.
+
+Do not claim live information without live retrieval.
+
+The LLM should explain structured results rather than generate the
+underlying meteorological data.
+
+====================================================================
+57. DATA PROVENANCE
+====================================================================
+
+Every important weather result should maintain provenance.
+
+Example:
+
+{
+  "source": "IMD",
+  "source_type": "official",
+  "observed_at": "...",
+  "retrieved_at": "...",
+  "valid_until": "...",
+  "model": null
+}
+
+For NWP:
+
+{
+  "source": "NOAA",
+  "source_type": "model",
+  "model": "GFS",
+  ...
+}
+
+This metadata should be available to the UI.
+
+====================================================================
+58. TESTING
+====================================================================
+
+Expand testing substantially.
+
+Backend tests:
+
+- provider tests
+- schema tests
+- normalization
+- validation
+- freshness
+- intent parsing
+- multilingual
+- conversation context
+- risk engines
+- model agreement
+- warnings
+- nearby events
+- GIS
+- agriculture
+- climate
+- API
+- failure handling
+- authentication
+
+Frontend tests:
+
+- components
+- routing
+- responsive behavior
+- theme
+- localization
+- accessibility
+- charts
+- map states
+- alerts
+
+End-to-end:
+
+1. current weather
+2. forecast
+3. warning
+4. nearby event
+5. cyclone
+6. agriculture
+7. climate
+8. NWP comparison
+9. multilingual
+10. voice
+11. location search
+12. alert subscription
+13. provider failure
+
+====================================================================
+59. MULTILINGUAL TEST MATRIX
+====================================================================
+
+Run equivalent weather queries in:
+
+English
+Hindi
+Bengali
+Tamil
+Telugu
+Marathi
+Gujarati
+Kannada
+Malayalam
+Punjabi
+Odia
+Urdu
+
+Verify:
+
+same intent
+same location
+same time range
+same weather parameters
+same warning severity
+same underlying recommendation
+
+Only language/presentation should change.
+
+====================================================================
+60. UI QUALITY ASSURANCE
+====================================================================
+
+Before considering frontend complete, inspect the application visually.
+
+Test:
+
+1920×1080
+1440×900
+1280×800
+1024×768
+768×1024
+390×844
+
+Check:
+
+navigation
+cards
+tables
+charts
+maps
+modals
+drawers
+chat
+forms
+alerts
+empty states
+loading states
+error states
+
+Fix every:
+
+overflow
+overlap
+distortion
+clipping
+misalignment
+inconsistent spacing
+unreadable text
+broken responsive behavior
+
+Do not declare completion based only on a successful build.
+
+====================================================================
+61. ERROR / EMPTY / LOADING STATES
+====================================================================
+
+Every major feature must have professional:
+
+Loading
+Empty
+Error
+Unavailable
+Stale
+Partial-data
+
+states.
+
+Avoid blank white screens.
+
+Avoid raw API errors.
+
+Translate user-facing errors according to locale.
+
+====================================================================
+62. DOCUMENTATION
+====================================================================
+
+Maintain:
+
+README.md
+ARCHITECTURE.md
+API.md
+SETUP.md
+DEVELOPMENT.md
+
+Create/update:
+
+docs/
+    architecture/
+    data-sources/
+    ai/
+    multilingual/
+    gis/
+    alerts/
+    deployment/
+    security/
+    testing/
+
+Document:
+
+provider roles
+data flow
+source authority
+fallback behavior
+language architecture
+environment variables
+deployment
+
+====================================================================
+63. DEVELOPMENT PHASES
+====================================================================
+
+Do not implement everything as disconnected pages.
+
+Work in this order:
+
+PHASE 1
+Repository audit
+
+PHASE 2
+Architecture gap analysis
+
+PHASE 3
+Provider abstraction + source registry
+
+PHASE 4
+Data schemas + normalization + validation
+
+PHASE 5
+Location intelligence
+
+PHASE 6
+Current weather + forecasts
+
+PHASE 7
+Warnings + nearby events
+
+PHASE 8
+NWP + model comparison
+
+PHASE 9
+Risk engines
+
+PHASE 10
+AI orchestration + tool calling
+
+PHASE 11
+Multilingual platform
+
+PHASE 12
+Voice
+
+PHASE 13
+GIS
+
+PHASE 14
+Agriculture
+
+PHASE 15
+Climate + seasonal
+
+PHASE 16
+Domain advisories
+
+PHASE 17
+Alerts + WebSocket
+
+PHASE 18
+Frontend redesign
+
+PHASE 19
+Security
+
+PHASE 20
+Observability
+
+PHASE 21
+Performance optimization
+
+PHASE 22
+Full testing
+
+PHASE 23
+Documentation
+
+====================================================================
+64. EXISTING CODE RULE
+====================================================================
+
+Before changing anything:
+
+inspect the repository.
+
+Identify:
+
+- working modules
+- incomplete modules
+- duplicated logic
+- fake data
+- hard-coded values
+- broken APIs
+- incorrect provider assumptions
+- frontend layout issues
+- technical debt
+
+Do not rewrite everything just because you can.
+
+Preserve working code where appropriate.
+
+Refactor when necessary.
+
+====================================================================
+65. NO FAKE COMPLETENESS
+====================================================================
+
+Never create:
+
+fake API responses
+fake official warnings
+fake radar
+fake satellite data
+fake model predictions
+fake weather stations
+
+just to make a UI appear complete.
+
+If integration is unavailable:
+
+build the correct provider interface,
+handle unavailable state,
+document configuration,
+and continue with real architecture.
+
+====================================================================
+66. FINAL PRODUCT EXPERIENCE
+====================================================================
+
+A user should be able to open WeatherGPT and naturally ask:
+
+"Will it rain tomorrow evening?"
+
+"क्या कल शाम बारिश होगी?"
+
+"Kal Delhi ka weather kaisa rahega?"
+
+"Is there dangerous weather near me?"
+
+"Compare IMD and GFS."
+
+"What is the temperature trend in Delhi?"
+
+"Should I irrigate my wheat crop?"
+
+"Can I travel tomorrow evening?"
+
+"Is there a cyclone near Mumbai?"
+
+"What weather conditions should I expect for marine travel?"
+
+"What are the rainfall anomalies this year?"
+
+The system should:
+
+1. understand the request
+2. resolve location
+3. resolve time
+4. detect language
+5. plan required tools
+6. retrieve relevant data
+7. validate freshness
+8. fuse sources where appropriate
+9. calculate intelligence/risk
+10. identify uncertainty
+11. explain the important factors
+12. cite/show source
+13. respond in the user's language
+14. optionally speak the answer
+15. update the UI/map/alerts where relevant
+
+====================================================================
+67. FINAL ACCEPTANCE CRITERIA
+====================================================================
+
+The project is complete only when:
+
+ARCHITECTURE
+[ ] documented architecture implemented
+[ ] modular provider system
+[ ] source router
+[ ] normalization layer
+[ ] validation layer
+[ ] provenance layer
+[ ] freshness layer
+
+DATA
+[ ] IMD provider
+[ ] MOSDAC provider
+[ ] NOAA provider
+[ ] GFS provider
+[ ] WRF architecture
+[ ] ERA5 provider
+[ ] OpenWeather provider
+[ ] Open-Meteo provider
+[ ] WeatherAPI provider
+[ ] NASA POWER provider
+
+INTELLIGENCE
+[ ] current weather
+[ ] forecast
+[ ] warnings
+[ ] nearby events
+[ ] cyclone intelligence
+[ ] model agreement
+[ ] uncertainty
+[ ] rain risk
+[ ] heat risk
+[ ] thunderstorm risk
+[ ] wind risk
+[ ] flood risk
+[ ] travel risk
+[ ] agriculture risk
+
+DOMAIN
+[ ] agriculture
+[ ] aviation architecture
+[ ] marine architecture
+[ ] urban planning architecture
+[ ] travel
+[ ] outdoor activities
+[ ] disaster management
+
+AI
+[ ] intent understanding
+[ ] tool calling
+[ ] query planning
+[ ] multi-turn context
+[ ] grounded response
+[ ] explainability
+[ ] multilingual AI
+
+LANGUAGE
+[ ] automatic language detection
+[ ] broad Indian language architecture
+[ ] native-language UI
+[ ] code-switching
+[ ] RTL
+[ ] localized terminology
+[ ] translation abstraction
+
+VOICE
+[ ] multilingual STT architecture
+[ ] multilingual TTS architecture
+[ ] Bhashini-compatible adapter
+[ ] voice UX
+
+GIS
+[ ] interactive map
+[ ] warning polygons
+[ ] stations
+[ ] events
+[ ] layers
+[ ] legends
+[ ] location interaction
+
+CLIMATE
+[ ] historical analysis
+[ ] anomalies
+[ ] trends
+[ ] seasonal/extended architecture
+
+ALERTS
+[ ] alert center
+[ ] subscriptions
+[ ] WebSocket
+[ ] deduplication
+[ ] freshness
+[ ] official-source distinction
+
+FRONTEND
+[ ] professional product UI
+[ ] desktop optimized
+[ ] tablet optimized
+[ ] mobile optimized
+[ ] light theme
+[ ] dark theme
+[ ] system theme
+[ ] no horizontal overflow
+[ ] no distorted desktop UI
+[ ] responsive charts
+[ ] responsive maps
+[ ] accessibility
+[ ] loading/error/empty states
+
+SECURITY
+[ ] authentication architecture
+[ ] authorization
+[ ] rate limiting
+[ ] secret management
+[ ] no frontend API keys
+[ ] audit logging
+
+OPERATIONS
+[ ] health endpoint
+[ ] readiness endpoint
+[ ] structured logging
+[ ] metrics
+[ ] provider health
+[ ] latency monitoring
+[ ] stale-feed detection
+
+QUALITY
+[ ] backend tests
+[ ] frontend tests
+[ ] integration tests
+[ ] multilingual tests
+[ ] end-to-end tests
+[ ] production build
+[ ] no console errors
+[ ] no broken routes
+
+====================================================================
+68. START IMPLEMENTATION
+====================================================================
+
+START NOW.
+
+Do NOT ask me to redesign the architecture again.
+
+Do NOT start by creating random frontend screens.
+
+FIRST:
+
+1. Inspect the entire repository.
+2. Read the existing architecture.
+3. Map the repository against the requirements above.
+4. Create an internal gap-analysis.
+5. Identify what already works.
+6. Identify what is incomplete.
+7. Identify what is fake/mock.
+8. Identify architecture violations.
+9. Identify frontend layout problems.
+10. Identify provider/integration gaps.
+
+THEN:
+
+Implement the system phase-by-phase.
+
+After every major phase:
+
+- run tests
+- run lint/type checks
+- build frontend
+- verify API behavior
+- inspect affected UI
+- fix regressions
+
+Do not stop at scaffolding.
+
+Do not stop after generating components.
+
+Do not call the project complete because:
+
+"npm run build succeeded."
+
+The final criterion is functional, visual, architectural and
+operational completeness.
+
+====================================================================
+69. MOST IMPORTANT PRINCIPLE
+====================================================================
+
+WeatherGPT must be built as:
+
+A REAL WEATHER INTELLIGENCE PLATFORM
+
+NOT:
+
+A WEATHER UI
++
+A CHATBOT
++
+SOME MOCK APIs
+
+The system should be:
+
+AUTHORITATIVE
+GROUNDED
+MULTILINGUAL
+GEOSPATIAL
+REAL-TIME
+EXPLAINABLE
+SCALABLE
+ACCESSIBLE
+PROFESSIONAL
+SECURE
+EXTENSIBLE
+
+Build for the final product, not for a demo.
+
+====================================================================
+END MASTER DIRECTIVE
+====================================================================

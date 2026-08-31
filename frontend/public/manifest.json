@@ -1,0 +1,48 @@
+{
+  "short_name": "WeatherGPT",
+  "name": "WeatherGPT - National Weather Intelligence Platform",
+  "description": "AI-Powered Conversational Weather Intelligence & Decision-Support Platform with IMD, GFS, and Satellite Telemetry.",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#090d16",
+  "theme_color": "#0284c7",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["weather", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "AI Weather Chat",
+      "short_name": "Chat",
+      "description": "Conversational Weather Intelligence",
+      "url": "/?tab=chat",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Live Radar & Cyclone",
+      "short_name": "Radar",
+      "description": "Tropical Cyclone & Radar Proximity",
+      "url": "/?tab=cyclone",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Agromet Kisan Portal",
+      "short_name": "Agri",
+      "description": "Agricultural Decision Support",
+      "url": "/?tab=advisory",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}
