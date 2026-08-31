@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Plane, Anchor, ShieldAlert, CheckCircle2, AlertTriangle, Wind, Eye, Compass, Info } from 'lucide-react';
 import { useWeather } from '../../context/WeatherContext';
+import { useTranslation } from '../../hooks/useTranslation';
 import { weatherService } from '../../services/api';
 import { DomainAdvisoryResponse } from '../../types/weather';
 
 export const DomainAdvisoriesView: React.FC = () => {
-  const { location } = useWeather();
+  const { location, language } = useWeather();
+  const { t } = useTranslation();
   const [aviation, setAviation] = useState<DomainAdvisoryResponse | null>(null);
   const [marine, setMarine] = useState<DomainAdvisoryResponse | null>(null);
   const [disaster, setDisaster] = useState<DomainAdvisoryResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const isHi = language === 'hi';
 
   useEffect(() => {
     const fetchDomains = async () => {
@@ -30,7 +34,7 @@ export const DomainAdvisoriesView: React.FC = () => {
       }
     };
     fetchDomains();
-  }, [location]);
+  }, [location, language]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -42,11 +46,11 @@ export const DomainAdvisoriesView: React.FC = () => {
               <ShieldAlert className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">
-              Specialized Domain Decision-Support Portal
+              {isHi ? 'विशेषज्ञ डोमेन निर्णय-सहायता पोर्टल' : 'Specialized Domain Decision-Support Portal'}
             </h2>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Aerodrome Aviation Meteorological Guidance, Ocean State Wave Bulletins & NDMA Emergency Readiness for {location}
+            {isHi ? `हवाई अड्डा विमानन मौसम मार्गदर्शन, समुद्री लहर बुलेटिन और एनडीएमए आपातकालीन तत्परता (${location})` : `Aerodrome Aviation Meteorological Guidance, Ocean State Wave Bulletins & NDMA Emergency Readiness for ${location}`}
           </p>
         </div>
       </div>

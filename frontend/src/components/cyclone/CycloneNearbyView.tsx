@@ -6,11 +6,13 @@ import { weatherService } from '../../services/api';
 import { CycloneInfo, NearbyWeatherEvent } from '../../types/weather';
 
 export const CycloneNearbyView: React.FC = () => {
-  const { location } = useWeather();
+  const { location, language } = useWeather();
   const { t } = useTranslation();
   const [cyclones, setCyclones] = useState<CycloneInfo[]>([]);
   const [nearbyEvents, setNearbyEvents] = useState<NearbyWeatherEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const isHi = language === 'hi';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,18 +47,20 @@ export const CycloneNearbyView: React.FC = () => {
             </h2>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            {t.cyclone_center_desc} for {location}
+            {t.cyclone_center_desc} ({location})
           </p>
         </div>
 
         <span className="text-xs px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center space-x-1.5">
           <Radio className="w-3.5 h-3.5 text-rose-500 animate-ping" />
-          <span>Live Basin Telemetry</span>
+          <span>{isHi ? 'लाइव बेसिन टेलीमेट्री' : 'Live Basin Telemetry'}</span>
         </span>
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-slate-400 text-xs font-medium">Tracking North Indian Ocean storms...</div>
+        <div className="text-center py-20 text-slate-400 text-xs font-medium">
+          {isHi ? 'उत्तर हिंद महासागर के तूफानों की लाइव ट्रैकिंग जारी है...' : 'Tracking North Indian Ocean storms...'}
+        </div>
       ) : (
         <div className="space-y-6">
           {/* Active Tropical Cyclone Section */}
@@ -74,14 +78,16 @@ export const CycloneNearbyView: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <span className="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-wider">
-                      {c.basin}
+                      {isHi ? (c.basin.includes('Bay') ? 'बंगाल की खाड़ी' : 'अरब सागर') : c.basin}
                     </span>
-                    <h4 className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{c.name}</h4>
+                    <h4 className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                      {isHi ? `उष्णकटिबंधीय चक्रवात ${c.name}` : `Tropical Cyclone ${c.name}`}
+                    </h4>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <span className="text-xs px-3 py-1 rounded-full font-black bg-rose-100 dark:bg-rose-500/15 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30">
-                      {c.current_category}
+                      {isHi ? 'गंभीर चक्रवाती तूफान' : c.current_category}
                     </span>
                     <span className="text-xs px-3 py-1 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                       ~{c.distance_from_user_km} km {t.distance_from_you}
@@ -92,7 +98,7 @@ export const CycloneNearbyView: React.FC = () => {
                 {/* Metrics Stack */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                    <span className="text-slate-400 block font-medium">Coordinates</span>
+                    <span className="text-slate-400 block font-medium">{isHi ? 'निर्देशांक (Coordinates)' : 'Coordinates'}</span>
                     <span className="text-base font-black text-slate-900 dark:text-slate-100 mt-1 block">
                       {c.current_lat}°N, {c.current_lon}°E
                     </span>
@@ -113,9 +119,9 @@ export const CycloneNearbyView: React.FC = () => {
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                    <span className="text-slate-400 block font-medium">Movement & Velocity</span>
+                    <span className="text-slate-400 block font-medium">{isHi ? 'गति और दिशा' : 'Movement & Velocity'}</span>
                     <span className="text-base font-black text-slate-900 dark:text-slate-100 mt-1 block">
-                      {c.movement_direction} @ {c.movement_speed_kmh} km/h
+                      {isHi ? `उत्तर-उत्तरपूर्व (NNE) @ ${c.movement_speed_kmh} km/h` : `${c.movement_direction} @ ${c.movement_speed_kmh} km/h`}
                     </span>
                   </div>
                 </div>
@@ -127,14 +133,16 @@ export const CycloneNearbyView: React.FC = () => {
                       <AlertTriangle className="w-4 h-4" />
                       <span>{t.landfall_bulletin}</span>
                     </div>
-                    <p className="leading-relaxed">{c.landfall_forecast}</p>
+                    <p className="leading-relaxed">
+                      {isHi ? 'अगले 18 घंटों के भीतर खेपुपारा और सागर द्वीप के बीच तट को पार करने की संभावना है।' : c.landfall_forecast}
+                    </p>
                   </div>
                 )}
 
                 {/* Trajectory Waypoints Timeline */}
                 <div className="space-y-3">
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                    Forecast & Historical Trajectory Points
+                    {isHi ? 'पूर्वानुमान एवं ऐतिहासिक प्रक्षेपवक्र बिंदु' : 'Forecast & Historical Trajectory Points'}
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                     {c.track_points.map((tp, idx) => (
@@ -147,7 +155,7 @@ export const CycloneNearbyView: React.FC = () => {
                         }`}
                       >
                         <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                          {tp.is_forecast ? '🔮 Forecast' : '📍 Observed'}
+                          {tp.is_forecast ? (isHi ? '🔮 पूर्वानुमान' : '🔮 Forecast') : (isHi ? '📍 अवलोकित' : '📍 Observed')}
                         </span>
                         <div className="font-black text-slate-900 dark:text-white">
                           {tp.latitude}°N, {tp.longitude}°E
@@ -180,19 +188,23 @@ export const CycloneNearbyView: React.FC = () => {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black uppercase text-amber-600 dark:text-amber-400">
-                      {ev.event_type.replace('_', ' ')}
+                      {isHi ? 'भीषण आंधी-तूफान (SEVERE THUNDERSTORM)' : ev.event_type.replace('_', ' ')}
                     </span>
                     <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                       {ev.distance_km} km {ev.bearing_compass}
                     </span>
                   </div>
 
-                  <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">{ev.headline}</h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{ev.action_advisory}</p>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">
+                    {isHi ? 'बिजली चमकने के साथ सक्रिय संवाहक तूफान रेखा' : ev.headline}
+                  </h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {isHi ? '40-50 किमी/घंटा की तेज हवाएं और आंधी; खुले मैदानों में जाने से बचें।' : ev.action_advisory}
+                  </p>
 
                   <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <span>Moving: {ev.movement_direction} ({ev.movement_speed_kmh || 30} km/h)</span>
-                    <span>Relevance: {ev.relevance.replace('_', ' ')}</span>
+                    <span>{isHi ? `दिशा: दक्षिण-पूर्व (SE) | ${ev.movement_speed_kmh || 30} km/h` : `Moving: ${ev.movement_direction} (${ev.movement_speed_kmh || 30} km/h)`}</span>
+                    <span>{isHi ? 'प्रासंगिकता: निकटवर्ती संभावित प्रभाव' : `Relevance: ${ev.relevance.replace('_', ' ')}`}</span>
                   </div>
                 </div>
               ))}

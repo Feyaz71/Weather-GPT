@@ -129,14 +129,10 @@ export const WeatherMap: React.FC = () => {
             style={{ height: '100%', width: '100%', background: theme === 'dark' ? '#090d16' : '#e2e8f0' }}
             scrollWheelZoom={true}
           >
-            {/* Tile Layer based on active theme */}
+            {/* Free Zero-Key OpenStreetMap Tile Layer */}
             <TileLayer
-              attribution='&copy; <a href="https://carto.com/">CARTO</a> & IMD'
-              url={
-                theme === 'dark'
-                  ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-                  : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-              }
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & IMD'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
             {/* Warning Polygons Layer */}
