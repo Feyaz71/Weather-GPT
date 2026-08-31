@@ -52,6 +52,40 @@ async def evaluate_weather_risk(request: RiskQueryRequest):
     return rain_risk_engine.analyze(obs, fc, warns)
 
 
+@router.get("/agri-advisory", response_model=AgricultureAdvisory)
+@router.get("/agriculture", response_model=AgricultureAdvisory)
+async def get_agriculture_advisory_get(
+    location: str = Query("Delhi", description="District or city name"),
+    crop: str = Query("wheat", description="Crop name"),
+    stage: str = Query("Vegetative Growth", description="Crop growth stage")
+):
+    """Generate real-time agromet advisory for irrigation, spraying, and crop protection."""
+    loc = geo_resolver.resolve_location(location)
+    obs = await imd_provider.get_current_weather(loc)
+    fc = await imd_provider.get_forecast(loc, days=3)
+    warns = await imd_provider.get_warnings(loc)
+
+    crop_stage_enum = CropStage.VEGETATIVE
+    s_lower = stage.lower()
+    if "sow" in s_lower:
+        crop_stage_enum = CropStage.SOWING
+    elif "flower" in s_lower:
+        crop_stage_enum = CropStage.FLOWERING
+    elif "grain" in s_lower or "fill" in s_lower:
+        crop_stage_enum = CropStage.GRAIN_FILLING
+    elif "harvest" in s_lower or "matur" in s_lower:
+        crop_stage_enum = CropStage.MATURITY
+
+    return agriculture_advisory_engine.generate_advisory(
+        location=loc,
+        crop_name=crop,
+        crop_stage=crop_stage_enum,
+        obs=obs,
+        forecast=fc,
+        warnings=warns
+    )
+
+
 @router.post("/agriculture", response_model=AgricultureAdvisory)
 async def generate_agriculture_advisory(request: AgricultureQueryRequest):
     """Generate agromet decision-support advisory for irrigation, spraying, and crop protection."""
@@ -83,6 +117,7 @@ async def evaluate_travel_risk(
     return travel_advisory_engine.evaluate_travel_risk(loc, obs, fc, warns)
 
 
+@router.get("/compare-models", response_model=ModelComparisonResponse)
 @router.get("/models/compare", response_model=ModelComparisonResponse)
 async def compare_nwp_models(
     location: str = Query("Delhi", description="City or district name")
