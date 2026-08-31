@@ -51,9 +51,26 @@ export const VoiceProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
+  const LANG_TAGS: Record<string, string> = {
+    en: 'en-IN',
+    hi: 'hi-IN',
+    bn: 'bn-IN',
+    te: 'te-IN',
+    mr: 'mr-IN',
+    ta: 'ta-IN',
+    gu: 'gu-IN',
+    ur: 'ur-IN',
+    kn: 'kn-IN',
+    ml: 'ml-IN',
+    pa: 'pa-IN',
+    or: 'or-IN',
+    as: 'as-IN'
+  };
+
   const startListening = (lang: string = 'en') => {
     if (recognition) {
-      recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+      const tag = LANG_TAGS[lang] || 'en-IN';
+      recognition.lang = tag;
       setTranscript('');
       setIsListening(true);
       try {
@@ -74,11 +91,22 @@ export const VoiceProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const speakText = (text: string, lang: string = 'en') => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      // Remove markdown bold and emojis before speech
-      const cleanText = text.replace(/[*_#~`]/g, '').replace(/⚠️|🌾|📊|•/g, '');
+      // Clean markdown and non-speech symbols
+      const cleanText = text
+        .replace(/[*_#~`]/g, '')
+        .replace(/[⚠️🌾📊💧📍🔮•]/g, '')
+        .trim();
+
       const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-      utterance.rate = 1.0;
+      const tag = LANG_TAGS[lang] || 'en-IN';
+      utterance.lang = tag;
+      utterance.rate = 0.95;
+
+      const voices = window.speechSynthesis.getVoices();
+      const matchVoice = voices.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase()) || v.lang.toLowerCase() === tag.toLowerCase());
+      if (matchVoice) {
+        utterance.voice = matchVoice;
+      }
 
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);

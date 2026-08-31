@@ -230,11 +230,15 @@ class WeatherAIOrchestrator:
                     "You are WeatherGPT, an authoritative meteorological intelligence assistant. "
                     "You MUST use ONLY the retrieved meteorological facts provided below. "
                     "NEVER fabricate weather observations, temperatures, precipitation amounts, or warnings. "
-                    f"Respond in {lang_meta.name_english} ({lang_meta.name_native})."
+                    f"CRITICAL INSTRUCTION: You MUST write your entire response exclusively in the native script of {lang_meta.name_native} ({lang_meta.name_english}). "
+                    f"All explanations, bullet points, warning details, crop advice, and summaries MUST be in {lang_meta.name_native}. "
+                    "Do NOT use English words unless proper nouns or meteorological units like °C, mm, km/h."
                 )
                 grounded_context = {
                     "location": target_loc,
                     "intent": intent.value,
+                    "language": lang_meta.name_english,
+                    "native_language_script": lang_meta.name_native,
                     "current_temp": obs_data.temperature_c if obs_data else None,
                     "condition": obs_data.weather_condition if obs_data else None,
                     "active_warnings": active_warning_texts,
@@ -244,7 +248,7 @@ class WeatherAIOrchestrator:
                     "nearby_events": [e.model_dump() for e in nearby_data] if nearby_data else None,
                     "model_agreement": comp_data.model_dump() if comp_data else None
                 }
-                user_prompt = f"User query: '{user_msg}'\nAuthoritative Data: {grounded_context}"
+                user_prompt = f"User query: '{user_msg}'\nRespond in {lang_meta.name_native} ({lang_meta.name_english}).\nAuthoritative Data: {grounded_context}"
                 response_text = await llm.generate_response(user_prompt, system_prompt, language=lang)
             except Exception as e:
                 logger.warning(f"External LLM generation failed ({e}). Using deterministic response synthesis.")
