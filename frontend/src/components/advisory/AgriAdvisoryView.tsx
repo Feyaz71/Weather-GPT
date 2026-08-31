@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sprout, Droplet, SprayCan as Spray, AlertOctagon, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useWeather } from '../../context/WeatherContext';
+import { useTranslation } from '../../hooks/useTranslation';
 import { weatherService } from '../../services/api';
 import { AgricultureAdvisory } from '../../types/weather';
 
@@ -21,7 +22,8 @@ const CROP_STAGES = [
 ];
 
 export const AgriAdvisoryView: React.FC = () => {
-  const { location } = useWeather();
+  const { location, language } = useWeather();
+  const { t } = useTranslation();
   const [selectedCrop, setSelectedCrop] = useState<string>('wheat');
   const [selectedStage, setSelectedStage] = useState<string>('Vegetative Growth');
   const [advisory, setAdvisory] = useState<AgricultureAdvisory | null>(null);
@@ -30,7 +32,7 @@ export const AgriAdvisoryView: React.FC = () => {
   const fetchAdvisory = async () => {
     try {
       setLoading(true);
-      const data = await weatherService.getAgricultureAdvisory(location, selectedCrop, selectedStage);
+      const data = await weatherService.getAgricultureAdvisory(location, selectedCrop, selectedStage, language);
       setAdvisory(data);
     } catch (e) {
       console.error("Advisory error", e);
@@ -41,7 +43,7 @@ export const AgriAdvisoryView: React.FC = () => {
 
   useEffect(() => {
     fetchAdvisory();
-  }, [location, selectedCrop, selectedStage]);
+  }, [location, selectedCrop, selectedStage, language]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -53,11 +55,11 @@ export const AgriAdvisoryView: React.FC = () => {
               <Sprout className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">
-              National Agrometeorological Decision Support Portal
+              {t.kisan_title}
             </h2>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            IMD Agromet Advisory Service (AAS) & Soil Moisture Guided Decisions for {location}
+            {t.kisan_subtitle} ({location})
           </p>
         </div>
 
@@ -99,14 +101,14 @@ export const AgriAdvisoryView: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Droplet className="w-5 h-5 text-sky-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-slate-100">Irrigation Scheduling</h3>
+                  <h3 className="text-base font-black text-slate-900 dark:text-slate-100">{t.irrigation_advice}</h3>
                 </div>
                 <span className={`text-xs px-3 py-1 rounded-full font-black uppercase ${
-                  advisory.irrigation_action === 'STOP' || advisory.irrigation_action === 'DELAY'
+                  advisory.irrigation_action.includes('STOP') || advisory.irrigation_action.includes('DELAY') || advisory.irrigation_action.includes('रोकें') || advisory.irrigation_action.includes('स्थगित')
                     ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30'
                     : 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30'
                 }`}>
-                  Action: {advisory.irrigation_action}
+                  {advisory.irrigation_action}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mt-4 leading-relaxed font-normal">
@@ -126,10 +128,10 @@ export const AgriAdvisoryView: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Spray className="w-5 h-5 text-indigo-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-slate-100">Agrochemical Spraying</h3>
+                  <h3 className="text-base font-black text-slate-900 dark:text-slate-100">{t.spray_advice}</h3>
                 </div>
                 <span className={`text-xs px-3 py-1 rounded-full font-black uppercase ${
-                  advisory.spraying_action === 'HOLD'
+                  advisory.spraying_action.includes('HOLD') || advisory.spraying_action.includes('रोकें')
                     ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30'
                     : 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30'
                 }`}>
@@ -153,10 +155,12 @@ export const AgriAdvisoryView: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <AlertOctagon className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-slate-100">Disease / Pest Risk</h3>
+                  <h3 className="text-base font-black text-slate-900 dark:text-slate-100">
+                    {language === 'hi' ? 'रोग / कीट प्रकोप जोखिम' : 'Disease / Pest Risk'}
+                  </h3>
                 </div>
                 <span className="text-xs px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 font-black">
-                  Surveillance
+                  {language === 'hi' ? 'निगरानी अलर्ट' : 'Surveillance'}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mt-4 leading-relaxed font-normal">
@@ -173,7 +177,7 @@ export const AgriAdvisoryView: React.FC = () => {
           {/* Meteorological Drivers Breakdown */}
           <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
             <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">
-              Key Meteorological Drivers Influencing This Advisory
+              {language === 'hi' ? 'सलाह को प्रभावित करने वाले प्रमुख मौसमी कारक' : 'Key Meteorological Drivers Influencing This Advisory'}
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {advisory.meteorological_drivers.map((drv, idx) => (

@@ -96,10 +96,11 @@ export const weatherService = {
   getAgricultureAdvisory: async (
     location: string,
     crop: string = 'wheat',
-    stage: string = 'Vegetative Growth'
+    stage: string = 'Vegetative Growth',
+    language: string = 'en'
   ): Promise<AgricultureAdvisory> => {
     const response = await apiClient.get<AgricultureAdvisory>('/intelligence/agri-advisory', {
-      params: { location, crop, stage },
+      params: { location, crop, stage, language },
     });
     return response.data;
   },

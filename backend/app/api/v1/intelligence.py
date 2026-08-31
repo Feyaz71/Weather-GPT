@@ -57,7 +57,8 @@ async def evaluate_weather_risk(request: RiskQueryRequest):
 async def get_agriculture_advisory_get(
     location: str = Query("Delhi", description="District or city name"),
     crop: str = Query("wheat", description="Crop name"),
-    stage: str = Query("Vegetative Growth", description="Crop growth stage")
+    stage: str = Query("Vegetative Growth", description="Crop growth stage"),
+    language: str = Query("en", description="Language code (e.g. en, hi)")
 ):
     """Generate real-time agromet advisory for irrigation, spraying, and crop protection."""
     loc = geo_resolver.resolve_location(location)
@@ -82,7 +83,8 @@ async def get_agriculture_advisory_get(
         crop_stage=crop_stage_enum,
         obs=obs,
         forecast=fc,
-        warnings=warns
+        warnings=warns,
+        language=language
     )
 
 
